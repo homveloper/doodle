@@ -47,20 +47,24 @@ Claude Code Web을 사용한 TDD 개발 사이클:
 4. **CI/CD 자동 확인**
    - Git 푸시 시 자동으로 여러 환경에서 테스트
 
-### 3. 폴더별 실험 구조
+### 3. Feature 중심 구조
 
-프로젝트는 다양한 실험을 폴더로 구분하여 관리합니다:
+프로젝트는 **feature별로** 폴더를 구분하며, 각 feature는 **가장 적합한 언어**를 자유롭게 선택합니다:
 
 ```
-doodle/
-├── calculator/        # 수학 계산 실험
-├── algorithms/        # 알고리즘 학습
-├── data-structures/   # 자료구조 구현
-├── api-experiments/   # API 테스트
-└── ...               # 더 많은 실험들
+features/
+├── calculator-js/          # JavaScript로 구현한 계산기
+├── algorithms-python/      # Python으로 구현한 알고리즘
+├── web-server-go/         # Go로 만든 웹 서버 (예정)
+├── data-viz-rust/         # Rust로 만든 데이터 시각화 (예정)
+└── ...                    # 언어에 구애받지 않는 실험들
 ```
 
-각 폴더는 독립적인 실험 공간이며, 자체 테스트를 포함합니다.
+**핵심 원칙:**
+- 각 feature는 완전히 독립적
+- 언어는 feature의 목적에 따라 선택
+- 모든 feature는 자체 테스트 포함
+- README에 언어와 목적 명시
 
 ## 💡 Claude Code Web 활용 팁
 
@@ -95,16 +99,24 @@ TDD 방식으로 먼저 테스트부터 작성하자."
 
 ## 🔄 개발 워크플로우
 
-### 새로운 기능 추가
+### 새로운 Feature 추가
 
 ```bash
-# 1. 새로운 브랜치 생성 (Claude가 자동으로 처리)
-# 2. Claude에게 요청
-"새로운 문자열 처리 유틸리티를 만들고 싶어.
-폴더 구조부터 시작해서 테스트까지 만들어줘."
+# 1. 언어를 명시하여 Claude에게 요청
+"새로운 문자열 처리 유틸리티를 Rust로 만들고 싶어.
+features/string-utils-rust 폴더를 만들고,
+테스트와 함께 구현해줘."
+
+# 2. Claude가 자동으로:
+#    - features/string-utils-rust/ 폴더 생성
+#    - 필요한 설정 파일 생성 (Cargo.toml 등)
+#    - 테스트 작성
+#    - 구현
+#    - README.md 작성
 
 # 3. 로컬에서 테스트
-npm test
+cd features/string-utils-rust
+cargo test
 
 # 4. 커밋 및 푸시 (Claude가 자동 처리)
 # 5. CI/CD 자동 실행
@@ -130,12 +142,30 @@ npm test
 
 ### 멀티 언어 프로젝트
 
-이 프로젝트는 Node.js와 Python을 함께 사용합니다. Claude에게 다음과 같이 요청할 수 있습니다:
+이 프로젝트의 강점은 **언어에 구애받지 않는다**는 점입니다. Claude에게 자유롭게 요청하세요:
 
 ```
-"같은 알고리즘을 Node.js와 Python 둘 다로 구현하고,
-각각의 테스트를 작성해줘. 성능 비교도 할 수 있게 해줘."
+"HTTP 서버를 만들고 싶은데, Go와 Node.js 두 가지 버전으로 만들어줘.
+각각 features/http-server-go, features/http-server-js에 만들고,
+성능 비교도 할 수 있게 벤치마크 테스트도 추가해줘."
 ```
+
+```
+"머신러닝 예제를 Python으로 만들고 싶어.
+features/ml-basics-python 폴더에 만들어줘."
+```
+
+```
+"시스템 프로그래밍을 배우고 싶어서 Rust로 간단한
+파일 시스템 유틸리티를 만들고 싶어."
+```
+
+**언어 선택 가이드:**
+- **JavaScript/Node.js**: 웹, API, 빠른 프로토타이핑
+- **Python**: 데이터, ML, 스크립팅
+- **Rust**: 시스템, 성능, 메모리 안정성
+- **Go**: 동시성, 서버, CLI 도구
+- **TypeScript**: 타입 안정성이 중요한 프로젝트
 
 ### CI/CD 활용
 
@@ -189,9 +219,18 @@ GitHub Actions가 자동으로:
 
 ### 통합 요청
 ```
-"새로운 data-structures 폴더를 만들고,
-스택과 큐를 구현해줘. 각각 완전한 테스트 케이스와
-함께 만들어줘. CI/CD 파이프라인에도 자동으로 포함되게 해줘."
+"새로운 feature를 C++로 만들고 싶어.
+features/data-structures-cpp 폴더에 스택과 큐를 구현하고,
+Google Test로 테스트 작성해줘.
+CI/CD 파이프라인에도 자동으로 포함되게 설정해줘."
+```
+
+### 언어별 Feature 요청
+```
+"features/ 폴더에 다음 feature들을 만들어줘:
+1. features/web-scraper-python - BeautifulSoup 사용
+2. features/rest-api-typescript - Express + TypeScript
+3. features/cli-tool-go - 간단한 파일 검색 도구"
 ```
 
 ## 🎓 배운 점과 팁

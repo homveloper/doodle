@@ -25,7 +25,9 @@ jobs:
         node-version: ${{ matrix.node-version }}
 
     - name: Run Node.js tests
-      run: npm test
+      run: |
+        cd features/calculator-js
+        npm test
 
     - name: Display test results
       if: always()
@@ -49,7 +51,9 @@ jobs:
         python-version: ${{ matrix.python-version }}
 
     - name: Run Python tests
-      run: python3 test_python.py
+      run: |
+        cd features/algorithms-python
+        python3 test_python.py
 
     - name: Display test results
       if: always()

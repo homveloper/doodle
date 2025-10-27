@@ -4,48 +4,68 @@ Claude Code Web 실험 프로젝트 - 새로운 기능과 시스템을 TDD로 �
 
 ## 📋 프로젝트 소개
 
-이 프로젝트는 [Claude Code Web](https://claude.com/claude-code)의 새로운 기능들을 탐색하고 실험하는 공간입니다. 다양한 기능, 시스템, 코드를 폴더별로 구분하여 시도해보고, TDD(Test-Driven Development)와 GitHub Actions CI/CD를 통해 자동으로 테스트합니다.
+이 프로젝트는 [Claude Code Web](https://claude.com/claude-code)의 새로운 기능들을 탐색하고 실험하는 공간입니다.
+
+**핵심 철학:**
+- 🌐 **언어 독립적**: 각 feature마다 가장 적합한 언어를 선택 (JavaScript, Python, Rust, Go 등)
+- 📦 **Feature 중심 구조**: 기능별로 독립적인 폴더에서 관리
+- ✅ **TDD 기반 개발**: 모든 코드는 테스트와 함께
+- 🚀 **자동화된 검증**: GitHub Actions CI/CD로 다양한 환경에서 테스트
 
 ## 🏗️ 프로젝트 구조
 
-현재 프로젝트는 다음과 같은 실험들을 포함하고 있습니다:
+Feature 중심의 모듈형 구조로 설계되었습니다:
 
 ```
 doodle/
-├── calculator.js          # Node.js 계산기 예제
-├── test.js               # Node.js 유닛 테스트
-├── test_python.py        # Python 테스트 (Fibonacci, Prime)
+├── features/                    # 모든 실험 기능들
+│   ├── calculator-js/          # JavaScript 계산기
+│   │   ├── calculator.js       # 계산기 로직
+│   │   ├── test.js            # 테스트 스위트
+│   │   ├── package.json       # Node.js 설정
+│   │   └── README.md          # 기능 문서
+│   │
+│   ├── algorithms-python/      # Python 알고리즘
+│   │   ├── test_python.py     # 알고리즘 & 테스트
+│   │   └── README.md          # 기능 문서
+│   │
+│   └── [새로운 features...]   # 앞으로 추가될 실험들
+│
 ├── .github/
 │   └── workflows/
-│       └── test.yml      # CI/CD 파이프라인
-├── package.json          # Node.js 프로젝트 설정
-└── README.md            # 이 파일
+│       └── test.yml           # CI/CD 파이프라인
+├── CLAUDE.md                  # Claude Code 활용 가이드
+├── README.md                  # 이 파일
+└── LICENSE
 ```
+
+### 현재 Features
+
+| Feature | 언어 | 설명 | 상태 |
+|---------|------|------|------|
+| **calculator-js** | JavaScript | 기본 수학 연산 함수 모음 | ✅ 완료 |
+| **algorithms-python** | Python | Fibonacci, 소수 판별 등 | ✅ 완료 |
 
 ## 🧪 테스트 주도 개발 (TDD)
 
-### Node.js 테스트
+각 feature는 독립적인 테스트 스위트를 가지고 있습니다:
 
-프로젝트는 외부 의존성 없이 자체 테스트 러너를 사용합니다:
-
+### Calculator (JavaScript)
 ```bash
+cd features/calculator-js
 npm test
 ```
+**커버리지:** 15개 테스트 - 덧셈, 뺄셈, 곱셈, 나눗셈, 거듭제곱, 모듈로
 
-**테스트 커버리지:**
-- ✓ 덧셈, 뺄셈, 곱셈, 나눗셈
-- ✓ 거듭제곱, 모듈로 연산
-- ✓ 0으로 나누기 예외 처리
-
-### Python 테스트
-
+### Algorithms (Python)
 ```bash
+cd features/algorithms-python
 python3 test_python.py
 ```
+**커버리지:** 8개 테스트 - Fibonacci, 소수 판별
 
-**테스트 커버리지:**
-- ✓ Fibonacci 수열 생성
-- ✓ 소수 판별 알고리즘
+### 전체 테스트 실행
+모든 features를 한번에 테스트하려면 CI/CD가 자동으로 처리합니다.
 
 ## 🚀 CI/CD 파이프라인
 
@@ -76,22 +96,45 @@ GitHub Actions를 통해 모든 푸시와 Pull Request에서 자동으로 테스
    cd doodle
    ```
 
-2. **테스트 실행**
+2. **특정 feature 테스트**
    ```bash
-   # Node.js 테스트
+   # JavaScript 계산기
+   cd features/calculator-js
    npm test
 
-   # Python 테스트
+   # Python 알고리즘
+   cd features/algorithms-python
    python3 test_python.py
    ```
 
-### 새로운 실험 추가
+### 새로운 Feature 추가
 
-1. 새로운 폴더를 만들어 기능/시스템 구분
-2. 테스트 파일 작성 (TDD 방식)
-3. 코드 구현
-4. 테스트 실행으로 검증
-5. Git 커밋 후 푸시하면 자동 CI/CD 실행
+새로운 실험을 시작할 때:
+
+1. **언어 선택**: 해당 feature에 가장 적합한 언어 결정
+   - 웹 관련? → JavaScript/TypeScript
+   - 데이터 처리? → Python
+   - 성능 중요? → Rust/Go
+   - 학습 목적? → 배우고 싶은 언어
+
+2. **폴더 구조 생성**
+   ```bash
+   mkdir -p features/my-feature-lang
+   cd features/my-feature-lang
+   ```
+
+3. **TDD로 개발**
+   - 테스트 먼저 작성
+   - 구현
+   - 테스트 통과 확인
+
+4. **문서화**
+   - README.md 작성
+   - 언어, 목적, 사용법 명시
+
+5. **CI/CD 자동 실행**
+   - Git 커밋 & 푸시
+   - GitHub Actions가 자동으로 테스트
 
 ## 🤖 Claude Code와 함께
 

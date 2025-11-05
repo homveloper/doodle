@@ -1,0 +1,27 @@
+# Air
+tmp/
+build-errors.log
+
+# Go build artifacts
+shop-server
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary
+*.test
+
+# Output of the go coverage tool
+*.out
+
+# Generated templ files
+*_templ.go
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~

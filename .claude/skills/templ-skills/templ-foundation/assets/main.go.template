@@ -1,0 +1,39 @@
+package main
+
+import (
+	"log"
+	"net/http"
+)
+
+func main() {
+	// Serve static files
+	fs := http.FileServer(http.Dir("static"))
+	http.Handle("/static/", http.StripPrefix("/static/", fs))
+
+	// Routes
+	http.HandleFunc("/", homeHandler)
+
+	// Start server
+	addr := ":8080"
+	log.Printf("Server starting on %s", addr)
+	if err := http.ListenAndServe(addr, nil); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func homeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "text/html")
+	w.Write([]byte(`
+		<!DOCTYPE html>
+		<html>
+		<head>
+			<title>Templ App</title>
+			<link rel="stylesheet" href="/static/styles.css">
+		</head>
+		<body>
+			<h1>Hello from Templ!</h1>
+			<p>Replace this handler with templ components.</p>
+		</body>
+		</html>
+	`))
+}

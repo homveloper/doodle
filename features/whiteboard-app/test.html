@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Whiteboard Tests</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            color: #333;
+            border-bottom: 3px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+
+        .test-section {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .test-result {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+
+        .pass {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745;
+        }
+
+        .fail {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545;
+        }
+
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        button:hover {
+            background: #45a049;
+        }
+
+        .mini-canvas {
+            border: 1px solid #ccc;
+            margin: 10px 0;
+        }
+
+        .summary {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎨 Whiteboard App - Test Suite</h1>
+
+    <div class="test-section">
+        <h2>Unit Tests</h2>
+        <div id="unit-tests"></div>
+        <button onclick="runUnitTests()">Run Unit Tests</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Integration Tests</h2>
+        <div id="integration-tests"></div>
+        <button onclick="runIntegrationTests()">Run Integration Tests</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Visual Tests</h2>
+        <div id="visual-tests"></div>
+        <button onclick="runVisualTests()">Run Visual Tests</button>
+    </div>
+
+    <div id="summary" class="summary" style="display: none;"></div>
+
+    <script src="whiteboard.js"></script>
+    <script>
+        let totalTests = 0;
+        let passedTests = 0;
+
+        function assertEqual(actual, expected, testName) {
+            totalTests++;
+            const passed = JSON.stringify(actual) === JSON.stringify(expected);
+
+            if (passed) {
+                passedTests++;
+                return {
+                    passed: true,
+                    message: `✓ ${testName}`
+                };
+            } else {
+                return {
+                    passed: false,
+                    message: `✗ ${testName}\n  Expected: ${JSON.stringify(expected)}\n  Actual: ${JSON.stringify(actual)}`
+                };
+            }
+        }
+
+        function assertTrue(condition, testName) {
+            totalTests++;
+            const passed = condition === true;
+
+            if (passed) {
+                passedTests++;
+                return {
+                    passed: true,
+                    message: `✓ ${testName}`
+                };
+            } else {
+                return {
+                    passed: false,
+                    message: `✗ ${testName}\n  Expected: true\n  Actual: ${condition}`
+                };
+            }
+        }
+
+        function assertNotNull(value, testName) {
+            totalTests++;
+            const passed = value !== null && value !== undefined;
+
+            if (passed) {
+                passedTests++;
+                return {
+                    passed: true,
+                    message: `✓ ${testName}`
+                };
+            } else {
+                return {
+                    passed: false,
+                    message: `✗ ${testName}\n  Value should not be null`
+                };
+            }
+        }
+
+        function displayResult(result, containerId) {
+            const container = document.getElementById(containerId);
+            const div = document.createElement('div');
+            div.className = `test-result ${result.passed ? 'pass' : 'fail'}`;
+            div.textContent = result.message;
+            container.appendChild(div);
+        }
+
+        function runUnitTests() {
+            totalTests = 0;
+            passedTests = 0;
+            document.getElementById('unit-tests').innerHTML = '';
+
+            console.log('Running Unit Tests...');
+
+            // Test 1: Whiteboard 인스턴스 생성
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 600;
+            const wb = new Whiteboard(canvas);
+
+            displayResult(
+                assertNotNull(wb, 'Whiteboard instance should be created'),
+                'unit-tests'
+            );
+
+            // Test 2: 초기 상태
+            displayResult(
+                assertEqual(wb.isDrawing, false, 'Initial isDrawing should be false'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.isPanning, false, 'Initial isPanning should be false'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.scale, 1, 'Initial scale should be 1'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.penSize, 4, 'Initial pen size should be 4'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.penColor, '#000000', 'Initial pen color should be black'),
+                'unit-tests'
+            );
+
+            // Test 3: 좌표 변환
+            const screenCoords = wb.screenToCanvas(100, 100);
+            displayResult(
+                assertTrue(
+                    screenCoords.x === 100 && screenCoords.y === 100,
+                    'Screen to canvas conversion (no transform)'
+                ),
+                'unit-tests'
+            );
+
+            // Test 4: 줌
+            wb.zoom(2, 400, 300);
+            displayResult(
+                assertEqual(wb.scale, 2, 'Zoom should update scale to 2'),
+                'unit-tests'
+            );
+
+            // Test 5: 팬
+            wb.pan(50, 50);
+            displayResult(
+                assertEqual(wb.offsetX, 50, 'Pan should update offsetX'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.offsetY, 50, 'Pan should update offsetY'),
+                'unit-tests'
+            );
+
+            // Test 6: 펜 설정
+            wb.setPenSize(8);
+            displayResult(
+                assertEqual(wb.penSize, 8, 'setPenSize should update pen size'),
+                'unit-tests'
+            );
+
+            wb.setPenColor('#FF0000');
+            displayResult(
+                assertEqual(wb.penColor, '#FF0000', 'setPenColor should update pen color'),
+                'unit-tests'
+            );
+
+            // Test 7: 그리기 시작
+            wb.startDrawing(10, 10);
+            displayResult(
+                assertNotNull(wb.currentStroke, 'startDrawing should create currentStroke'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.currentStroke.points.length, 1, 'Initial stroke should have 1 point'),
+                'unit-tests'
+            );
+
+            // Test 8: 그리기
+            wb.draw(20, 20);
+            wb.draw(30, 30);
+            displayResult(
+                assertEqual(wb.currentStroke.points.length, 3, 'Drawing should add points'),
+                'unit-tests'
+            );
+
+            // Test 9: 그리기 종료
+            wb.endDrawing();
+            displayResult(
+                assertEqual(wb.strokes.length, 1, 'endDrawing should save stroke'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.currentStroke, null, 'endDrawing should clear currentStroke'),
+                'unit-tests'
+            );
+
+            // Test 10: 클리어
+            wb.clear();
+            displayResult(
+                assertEqual(wb.strokes.length, 0, 'clear should remove all strokes'),
+                'unit-tests'
+            );
+
+            // Test 11: 뷰 리셋
+            wb.resetView();
+            displayResult(
+                assertEqual(wb.scale, 1, 'resetView should restore scale to 1'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.offsetX, 0, 'resetView should restore offsetX to 0'),
+                'unit-tests'
+            );
+
+            displayResult(
+                assertEqual(wb.offsetY, 0, 'resetView should restore offsetY to 0'),
+                'unit-tests'
+            );
+
+            updateSummary();
+        }
+
+        function runIntegrationTests() {
+            document.getElementById('integration-tests').innerHTML = '';
+
+            console.log('Running Integration Tests...');
+
+            // Integration Test 1: 전체 그리기 플로우
+            const canvas = document.createElement('canvas');
+            canvas.width = 800;
+            canvas.height = 600;
+            const wb = new Whiteboard(canvas);
+
+            wb.setPenColor('#FF0000');
+            wb.setPenSize(10);
+            wb.startDrawing(50, 50);
+            wb.draw(100, 100);
+            wb.draw(150, 150);
+            wb.endDrawing();
+
+            displayResult(
+                assertTrue(
+                    wb.strokes.length === 1 &&
+                    wb.strokes[0].color === '#FF0000' &&
+                    wb.strokes[0].size === 10 &&
+                    wb.strokes[0].points.length === 3,
+                    'Complete drawing flow should work correctly'
+                ),
+                'integration-tests'
+            );
+
+            // Integration Test 2: 여러 스트로크
+            wb.setPenColor('#00FF00');
+            wb.startDrawing(200, 200);
+            wb.draw(250, 250);
+            wb.endDrawing();
+
+            displayResult(
+                assertEqual(wb.strokes.length, 2, 'Multiple strokes should be saved'),
+                'integration-tests'
+            );
+
+            // Integration Test 3: 줌 후 그리기
+            wb.zoom(2, 400, 300);
+            wb.startDrawing(100, 100);
+            wb.draw(110, 110);
+            wb.endDrawing();
+
+            displayResult(
+                assertTrue(
+                    wb.strokes.length === 3,
+                    'Drawing should work after zoom'
+                ),
+                'integration-tests'
+            );
+
+            updateSummary();
+        }
+
+        function runVisualTests() {
+            document.getElementById('visual-tests').innerHTML = '';
+
+            console.log('Running Visual Tests...');
+
+            // Visual Test 1: 선 그리기
+            const canvas1 = document.createElement('canvas');
+            canvas1.className = 'mini-canvas';
+            canvas1.width = 300;
+            canvas1.height = 200;
+            const wb1 = new Whiteboard(canvas1);
+
+            wb1.setPenColor('#FF0000');
+            wb1.setPenSize(5);
+            wb1.startDrawing(50, 50);
+            wb1.draw(250, 150);
+            wb1.endDrawing();
+
+            const visualDiv1 = document.createElement('div');
+            visualDiv1.appendChild(document.createTextNode('Test: Red diagonal line'));
+            visualDiv1.appendChild(canvas1);
+            document.getElementById('visual-tests').appendChild(visualDiv1);
+
+            // Visual Test 2: 여러 색상
+            const canvas2 = document.createElement('canvas');
+            canvas2.className = 'mini-canvas';
+            canvas2.width = 300;
+            canvas2.height = 200;
+            const wb2 = new Whiteboard(canvas2);
+
+            const colors = ['#FF0000', '#00FF00', '#0000FF'];
+            colors.forEach((color, i) => {
+                wb2.setPenColor(color);
+                wb2.setPenSize(8);
+                wb2.startDrawing(50, 50 + i * 50);
+                wb2.draw(250, 50 + i * 50);
+                wb2.endDrawing();
+            });
+
+            const visualDiv2 = document.createElement('div');
+            visualDiv2.appendChild(document.createTextNode('Test: RGB horizontal lines'));
+            visualDiv2.appendChild(canvas2);
+            document.getElementById('visual-tests').appendChild(visualDiv2);
+
+            // Visual Test 3: 다양한 펜 크기
+            const canvas3 = document.createElement('canvas');
+            canvas3.className = 'mini-canvas';
+            canvas3.width = 300;
+            canvas3.height = 200;
+            const wb3 = new Whiteboard(canvas3);
+
+            [2, 4, 8, 16].forEach((size, i) => {
+                wb3.setPenSize(size);
+                wb3.startDrawing(50, 40 + i * 40);
+                wb3.draw(250, 40 + i * 40);
+                wb3.endDrawing();
+            });
+
+            const visualDiv3 = document.createElement('div');
+            visualDiv3.appendChild(document.createTextNode('Test: Different pen sizes (2, 4, 8, 16)'));
+            visualDiv3.appendChild(canvas3);
+            document.getElementById('visual-tests').appendChild(visualDiv3);
+
+            displayResult(
+                { passed: true, message: '✓ Visual tests completed - please verify manually' },
+                'visual-tests'
+            );
+        }
+
+        function updateSummary() {
+            const summaryDiv = document.getElementById('summary');
+            summaryDiv.style.display = 'block';
+            summaryDiv.innerHTML = `
+                <h3>Test Summary</h3>
+                <p>Total Tests: ${totalTests}</p>
+                <p>Passed: ${passedTests} ✓</p>
+                <p>Failed: ${totalTests - passedTests} ✗</p>
+                <p>Success Rate: ${((passedTests / totalTests) * 100).toFixed(1)}%</p>
+            `;
+        }
+
+        // 페이지 로드 시 모든 테스트 실행
+        window.addEventListener('load', () => {
+            console.log('Running all tests...');
+            runUnitTests();
+            setTimeout(() => {
+                runIntegrationTests();
+                setTimeout(() => {
+                    runVisualTests();
+                }, 100);
+            }, 100);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+{
+  "name": "whiteboard-app",
+  "version": "1.0.0",
+  "description": "무한 캔버스 그림판 애플리케이션",
+  "main": "whiteboard.js",
+  "scripts": {
+    "start": "python3 -m http.server 8000",
+    "test": "echo 'Open test.html in browser to run tests' && open test.html || xdg-open test.html || start test.html"
+  },
+  "keywords": [
+    "whiteboard",
+    "canvas",
+    "drawing",
+    "infinite-canvas",
+    "paint"
+  ],
+  "author": "",
+  "license": "MIT"
+}

@@ -1,0 +1,183 @@
+package templates
+
+templ Button(text string, onClick string, variant string) {
+	<button
+		class={ "btn", "btn-" + variant }
+		if onClick != "" {
+			hx-post={ onClick }
+		}
+	>
+		{ text }
+	</button>
+	<style>
+		.btn {
+			border: none;
+			padding: 12px 24px;
+			border-radius: 12px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			min-height: 44px;
+			min-width: 44px;
+			transition: all 0.2s;
+		}
+
+		.btn-primary {
+			background: #007AFF;
+			color: white;
+		}
+
+		.btn-primary:active {
+			background: #0056CC;
+		}
+
+		.btn-secondary {
+			background: #E5E5EA;
+			color: #333;
+		}
+
+		.btn-secondary:active {
+			background: #D1D1D6;
+		}
+
+		.btn-danger {
+			background: #FF3B30;
+			color: white;
+		}
+
+		.btn-danger:active {
+			background: #CC2E24;
+		}
+	</style>
+}
+
+templ EmptyState(icon string, message string, description string) {
+	<div class="empty-state">
+		<div class="empty-icon">{ icon }</div>
+		<div class="empty-message">{ message }</div>
+		<div class="empty-description">{ description }</div>
+	</div>
+	<style>
+		.empty-state {
+			text-align: center;
+			padding: 60px 20px;
+			color: #666;
+		}
+
+		.empty-icon {
+			font-size: 64px;
+			margin-bottom: 16px;
+		}
+
+		.empty-message {
+			font-size: 20px;
+			font-weight: 600;
+			margin-bottom: 8px;
+			color: #333;
+		}
+
+		.empty-description {
+			font-size: 14px;
+			color: #999;
+		}
+	</style>
+}
+
+templ Modal(id string, title string) {
+	<div id={ id } class="modal">
+		<div class="modal-backdrop" onclick="this.parentElement.style.display='none'"></div>
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3 class="modal-title">{ title }</h3>
+				<button class="modal-close" onclick="this.closest('.modal').style.display='none'">✕</button>
+			</div>
+			<div class="modal-body">
+				{ children... }
+			</div>
+		</div>
+	</div>
+	<style>
+		.modal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			z-index: 1000;
+		}
+
+		.modal-backdrop {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0, 0, 0, 0.5);
+		}
+
+		.modal-content {
+			position: absolute;
+			bottom: 0;
+			left: 0;
+			right: 0;
+			background: white;
+			border-radius: 16px 16px 0 0;
+			max-height: 90vh;
+			overflow-y: auto;
+			animation: slideUp 0.3s ease-out;
+		}
+
+		@keyframes slideUp {
+			from {
+				transform: translateY(100%);
+			}
+			to {
+				transform: translateY(0);
+			}
+		}
+
+		.modal-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 20px;
+			border-bottom: 1px solid #e0e0e0;
+		}
+
+		.modal-title {
+			font-size: 20px;
+			font-weight: 600;
+		}
+
+		.modal-close {
+			background: #E5E5EA;
+			border: none;
+			width: 32px;
+			height: 32px;
+			border-radius: 16px;
+			font-size: 20px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.modal-body {
+			padding: 20px;
+		}
+	</style>
+}
+
+templ LoadingSpinner() {
+	<div class="loading-spinner">
+		<div class="spinner"></div>
+	</div>
+	<style>
+		.loading-spinner {
+			display: flex;
+			justify-content: center;
+			padding: 40px;
+		}
+	</style>
+}

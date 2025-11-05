@@ -1,0 +1,234 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/homveloper/doodle/features/shop-templ/models"
+)
+
+templ ProductList(products []models.Product, categories []string) {
+	<div class="product-container">
+		<!-- Category Filter -->
+		<div class="category-filter">
+			<button
+				class="category-chip active"
+				hx-get="/products"
+				hx-target="#product-list"
+			>
+				전체
+			</button>
+			for _, category := range categories {
+				<button
+					class="category-chip"
+					hx-get={ "/products?category=" + category }
+					hx-target="#product-list"
+				>
+					{ category }
+				</button>
+			}
+		</div>
+		<!-- Product Grid -->
+		<div id="product-list" class="product-grid">
+			if len(products) == 0 {
+				@EmptyState("📦", "상품이 없습니다", "검색어를 변경하거나 필터를 해제해보세요")
+			} else {
+				for _, product := range products {
+					@ProductCard(product)
+				}
+			}
+		</div>
+	</div>
+	<style>
+		.product-container {
+			background: #f5f5f5;
+		}
+
+		.category-filter {
+			display: flex;
+			gap: 8px;
+			padding: 16px;
+			overflow-x: auto;
+			background: white;
+			border-bottom: 1px solid #e0e0e0;
+			-webkit-overflow-scrolling: touch;
+		}
+
+		.category-filter::-webkit-scrollbar {
+			display: none;
+		}
+
+		.category-chip {
+			background: #E5E5EA;
+			color: #333;
+			border: none;
+			padding: 8px 16px;
+			border-radius: 20px;
+			font-size: 14px;
+			font-weight: 500;
+			white-space: nowrap;
+			cursor: pointer;
+			min-height: 44px;
+		}
+
+		.category-chip.active {
+			background: #007AFF;
+			color: white;
+		}
+
+		.product-grid {
+			display: grid;
+			grid-template-columns: repeat(2, 1fr);
+			gap: 12px;
+			padding: 16px;
+		}
+
+		@media (max-width: 375px) {
+			.product-grid {
+				grid-template-columns: 1fr;
+			}
+		}
+	</style>
+}
+
+templ ProductCard(product models.Product) {
+	<div class="product-card">
+		<div class="product-image">
+			if product.ImageURL != "" {
+				<img src={ product.ImageURL } alt={ product.Name }/>
+			} else {
+				<div class="product-image-placeholder">
+					📦
+				</div>
+			}
+		</div>
+		<div class="product-info">
+			<div class="product-category">{ product.Category }</div>
+			<h3 class="product-name">{ product.Name }</h3>
+			<p class="product-price">₩{ formatPrice(product.Price) }</p>
+			<div class="product-stock">
+				if product.Stock > 0 {
+					<span class="stock-available">재고: { fmt.Sprintf("%d", product.Stock) }개</span>
+				} else {
+					<span class="stock-out">품절</span>
+				}
+			</div>
+		</div>
+		<button
+			class="add-to-cart-btn"
+			if product.Stock > 0 {
+				hx-post={ fmt.Sprintf("/cart/add?product_id=%d&quantity=1", product.ID) }
+				hx-target="#cart-badge"
+				hx-swap="outerHTML"
+			} else {
+				disabled
+			}
+		>
+			if product.Stock > 0 {
+				🛒 담기
+			} else {
+				품절
+			}
+		</button>
+	</div>
+	<style>
+		.product-card {
+			background: white;
+			border-radius: 12px;
+			overflow: hidden;
+			box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+			transition: transform 0.2s;
+		}
+
+		.product-card:active {
+			transform: scale(0.98);
+		}
+
+		.product-image {
+			width: 100%;
+			aspect-ratio: 1;
+			background: #f8f8f8;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			overflow: hidden;
+		}
+
+		.product-image img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.product-image-placeholder {
+			font-size: 48px;
+		}
+
+		.product-info {
+			padding: 12px;
+		}
+
+		.product-category {
+			font-size: 11px;
+			color: #999;
+			text-transform: uppercase;
+			margin-bottom: 4px;
+		}
+
+		.product-name {
+			font-size: 14px;
+			font-weight: 600;
+			color: #333;
+			margin-bottom: 8px;
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+
+		.product-price {
+			font-size: 16px;
+			font-weight: 700;
+			color: #007AFF;
+			margin-bottom: 8px;
+		}
+
+		.product-stock {
+			font-size: 12px;
+			margin-bottom: 8px;
+		}
+
+		.stock-available {
+			color: #34C759;
+		}
+
+		.stock-out {
+			color: #FF3B30;
+			font-weight: 600;
+		}
+
+		.add-to-cart-btn {
+			width: 100%;
+			background: #007AFF;
+			color: white;
+			border: none;
+			padding: 12px;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			min-height: 44px;
+			transition: background 0.2s;
+		}
+
+		.add-to-cart-btn:active:not(:disabled) {
+			background: #0056CC;
+		}
+
+		.add-to-cart-btn:disabled {
+			background: #E5E5EA;
+			color: #999;
+			cursor: not-allowed;
+		}
+	</style>
+}
+
+func formatPrice(price float64) string {
+	return fmt.Sprintf("%.0f", price)
+}

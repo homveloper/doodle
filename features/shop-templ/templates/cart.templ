@@ -1,0 +1,364 @@
+package templates
+
+import (
+	"fmt"
+	"github.com/homveloper/doodle/features/shop-templ/models"
+)
+
+templ CartDrawer(cart *models.Cart) {
+	<div class="cart-drawer-overlay" id="cart-overlay" onclick="closeCart()">
+		<div class="cart-drawer" onclick="event.stopPropagation()">
+			<div class="cart-header">
+				<h2 class="cart-title">장바구니</h2>
+				<button class="cart-close" onclick="closeCart()">✕</button>
+			</div>
+			<div class="cart-content">
+				if cart == nil || len(cart.Items) == 0 {
+					@EmptyState("🛒", "장바구니가 비어있습니다", "상품을 추가해보세요")
+				} else {
+					<div class="cart-items">
+						for _, item := range cart.Items {
+							@CartItem(item)
+						}
+					</div>
+					<div class="cart-summary">
+						<div class="summary-row">
+							<span>상품 개수</span>
+							<span>{ fmt.Sprintf("%d개", cart.GetItemCount()) }</span>
+						</div>
+						<div class="summary-row total">
+							<span>총 금액</span>
+							<span>₩{ formatPrice(cart.Total) }</span>
+						</div>
+					</div>
+					<div class="cart-actions">
+						<button class="checkout-btn">
+							주문하기 (₩{ formatPrice(cart.Total) })
+						</button>
+						<button
+							class="clear-cart-btn"
+							hx-post="/cart/clear"
+							hx-target="#cart-drawer"
+							hx-swap="innerHTML"
+						>
+							장바구니 비우기
+						</button>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+	<script>
+		function closeCart() {
+			document.getElementById('cart-overlay').remove();
+		}
+		// Show the drawer
+		document.getElementById('cart-overlay').style.display = 'block';
+	</script>
+	<style>
+		.cart-drawer-overlay {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0, 0, 0, 0.5);
+			z-index: 1000;
+		}
+
+		.cart-drawer {
+			position: absolute;
+			right: 0;
+			top: 0;
+			bottom: 0;
+			width: 100%;
+			max-width: 430px;
+			background: white;
+			box-shadow: -2px 0 8px rgba(0,0,0,0.2);
+			display: flex;
+			flex-direction: column;
+			animation: slideIn 0.3s ease-out;
+		}
+
+		@keyframes slideIn {
+			from {
+				transform: translateX(100%);
+			}
+			to {
+				transform: translateX(0);
+			}
+		}
+
+		.cart-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 20px;
+			border-bottom: 1px solid #e0e0e0;
+		}
+
+		.cart-title {
+			font-size: 24px;
+			font-weight: 700;
+		}
+
+		.cart-close {
+			background: #E5E5EA;
+			border: none;
+			width: 36px;
+			height: 36px;
+			border-radius: 18px;
+			font-size: 24px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.cart-content {
+			flex: 1;
+			overflow-y: auto;
+			display: flex;
+			flex-direction: column;
+		}
+
+		.cart-items {
+			flex: 1;
+		}
+
+		.cart-summary {
+			padding: 20px;
+			border-top: 1px solid #e0e0e0;
+			background: #f8f8f8;
+		}
+
+		.summary-row {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 12px;
+			font-size: 14px;
+			color: #666;
+		}
+
+		.summary-row.total {
+			font-size: 20px;
+			font-weight: 700;
+			color: #333;
+			margin-bottom: 0;
+		}
+
+		.cart-actions {
+			padding: 16px;
+			border-top: 1px solid #e0e0e0;
+			display: flex;
+			flex-direction: column;
+			gap: 12px;
+		}
+
+		.checkout-btn {
+			background: #007AFF;
+			color: white;
+			border: none;
+			padding: 16px;
+			border-radius: 12px;
+			font-size: 16px;
+			font-weight: 600;
+			cursor: pointer;
+			min-height: 44px;
+		}
+
+		.checkout-btn:active {
+			background: #0056CC;
+		}
+
+		.clear-cart-btn {
+			background: white;
+			color: #FF3B30;
+			border: 1px solid #FF3B30;
+			padding: 12px;
+			border-radius: 12px;
+			font-size: 14px;
+			font-weight: 600;
+			cursor: pointer;
+			min-height: 44px;
+		}
+
+		.clear-cart-btn:active {
+			background: #FFF5F5;
+		}
+	</style>
+}
+
+templ CartItem(item models.CartItem) {
+	<div class="cart-item" id={ fmt.Sprintf("cart-item-%d", item.Product.ID) }>
+		<div class="cart-item-image">
+			if item.Product.ImageURL != "" {
+				<img src={ item.Product.ImageURL } alt={ item.Product.Name }/>
+			} else {
+				<div class="cart-item-placeholder">📦</div>
+			}
+		</div>
+		<div class="cart-item-info">
+			<div class="cart-item-name">{ item.Product.Name }</div>
+			<div class="cart-item-price">₩{ formatPrice(item.Product.Price) }</div>
+			<div class="quantity-control">
+				<button
+					class="quantity-btn"
+					hx-post={ fmt.Sprintf("/cart/update?product_id=%d&quantity=%d", item.Product.ID, item.Quantity-1) }
+					hx-target="#cart-drawer"
+					hx-swap="innerHTML"
+				>
+					−
+				</button>
+				<span class="quantity-value">{ fmt.Sprintf("%d", item.Quantity) }</span>
+				<button
+					class="quantity-btn"
+					hx-post={ fmt.Sprintf("/cart/update?product_id=%d&quantity=%d", item.Product.ID, item.Quantity+1) }
+					hx-target="#cart-drawer"
+					hx-swap="innerHTML"
+					if item.Quantity >= item.Product.Stock {
+						disabled
+					}
+				>
+					+
+				</button>
+			</div>
+		</div>
+		<div class="cart-item-actions">
+			<div class="cart-item-total">
+				₩{ formatPrice(item.Product.Price * float64(item.Quantity)) }
+			</div>
+			<button
+				class="remove-btn"
+				hx-post={ fmt.Sprintf("/cart/remove?product_id=%d", item.Product.ID) }
+				hx-target="#cart-drawer"
+				hx-swap="innerHTML"
+			>
+				🗑️
+			</button>
+		</div>
+	</div>
+	<style>
+		.cart-item {
+			display: flex;
+			gap: 12px;
+			padding: 16px;
+			border-bottom: 1px solid #e0e0e0;
+			align-items: center;
+		}
+
+		.cart-item-image {
+			width: 80px;
+			height: 80px;
+			border-radius: 8px;
+			background: #f8f8f8;
+			flex-shrink: 0;
+			overflow: hidden;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.cart-item-image img {
+			width: 100%;
+			height: 100%;
+			object-fit: cover;
+		}
+
+		.cart-item-placeholder {
+			font-size: 32px;
+		}
+
+		.cart-item-info {
+			flex: 1;
+		}
+
+		.cart-item-name {
+			font-size: 14px;
+			font-weight: 600;
+			margin-bottom: 4px;
+			color: #333;
+		}
+
+		.cart-item-price {
+			font-size: 14px;
+			color: #666;
+			margin-bottom: 8px;
+		}
+
+		.quantity-control {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+
+		.quantity-btn {
+			width: 32px;
+			height: 32px;
+			border: 1px solid #ddd;
+			background: white;
+			border-radius: 8px;
+			font-size: 18px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			min-height: 44px;
+			min-width: 44px;
+		}
+
+		.quantity-btn:active:not(:disabled) {
+			background: #f8f8f8;
+		}
+
+		.quantity-btn:disabled {
+			opacity: 0.3;
+			cursor: not-allowed;
+		}
+
+		.quantity-value {
+			font-size: 16px;
+			font-weight: 600;
+			min-width: 20px;
+			text-align: center;
+		}
+
+		.cart-item-actions {
+			display: flex;
+			flex-direction: column;
+			align-items: flex-end;
+			gap: 8px;
+		}
+
+		.cart-item-total {
+			font-size: 16px;
+			font-weight: 700;
+			color: #007AFF;
+		}
+
+		.remove-btn {
+			background: none;
+			border: none;
+			font-size: 20px;
+			cursor: pointer;
+			padding: 8px;
+			min-height: 44px;
+			min-width: 44px;
+		}
+
+		.remove-btn:active {
+			opacity: 0.6;
+		}
+	</style>
+}
+
+templ CartBadge(count int) {
+	<span class="cart-badge" id="cart-badge" hx-swap-oob="true">
+		if count > 99 {
+			99+
+		} else {
+			{ fmt.Sprintf("%d", count) }
+		}
+	</span>
+}

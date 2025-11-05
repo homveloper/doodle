@@ -1,0 +1,16 @@
+#!/bin/bash
+# JCat launcher script
+
+# Get the directory where this script is located
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+JAR_FILE="$SCRIPT_DIR/build/libs/jcat-1.0.0.jar"
+
+# Check if JAR exists
+if [ ! -f "$JAR_FILE" ]; then
+    echo "Error: JAR file not found at $JAR_FILE"
+    echo "Please build the project first: ./gradlew jar"
+    exit 1
+fi
+
+# Run the JAR with all arguments
+java -jar "$JAR_FILE" "$@"

@@ -1,0 +1,251 @@
+package templates
+
+templ NewPostForm() {
+	@Layout("New Post - Blog Doodle") {
+		<div class="form-container">
+			<div class="form-header">
+				<h2>Write New Post</h2>
+				<a href="/" class="btn-secondary">← Back to Home</a>
+			</div>
+			<form
+				hx-post="/posts"
+				hx-target="#post-list"
+				hx-swap="afterbegin"
+				class="post-form"
+			>
+				<div class="form-group">
+					<label for="title">Title</label>
+					<input
+						type="text"
+						id="title"
+						name="title"
+						class="form-input"
+						placeholder="Enter post title"
+						required
+					/>
+				</div>
+				<div class="form-group">
+					<label for="content">Content</label>
+					<textarea
+						id="content"
+						name="content"
+						class="form-textarea"
+						rows="10"
+						placeholder="Write your post content here..."
+						required
+					></textarea>
+				</div>
+				<div class="form-group">
+					<label for="tags-input">Tags</label>
+					<div class="tags-container">
+						<div id="tags-display" class="tags-display"></div>
+						<input
+							type="text"
+							id="tags-input"
+							class="form-input"
+							placeholder="Add tags (press Enter or comma)"
+						/>
+						<input type="hidden" id="tags" name="tags" value=""/>
+					</div>
+					<small class="form-hint">Press Enter or use comma to add tags</small>
+				</div>
+				<div class="form-actions">
+					<button type="submit" class="btn-primary">Publish Post</button>
+					<button type="reset" class="btn-secondary" onclick="clearTags()">Clear Form</button>
+				</div>
+			</form>
+		</div>
+		<style>
+			.form-container {
+				background: white;
+				padding: 2rem;
+				border-radius: 8px;
+				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+			}
+			.form-header {
+				display: flex;
+				justify-content: space-between;
+				align-items: center;
+				margin-bottom: 2rem;
+				padding-bottom: 1rem;
+				border-bottom: 2px solid #e0e0e0;
+			}
+			.form-header h2 {
+				font-size: 1.8rem;
+				color: #2c3e50;
+			}
+			.form-group {
+				margin-bottom: 1.5rem;
+			}
+			.form-group label {
+				display: block;
+				margin-bottom: 0.5rem;
+				font-weight: 600;
+				color: #2c3e50;
+			}
+			.form-input {
+				width: 100%;
+				padding: 0.75rem 1rem;
+				font-size: 1rem;
+				border: 2px solid #e0e0e0;
+				border-radius: 6px;
+				transition: border-color 0.3s;
+			}
+			.form-input:focus {
+				outline: none;
+				border-color: #3498db;
+			}
+			.form-textarea {
+				width: 100%;
+				padding: 0.75rem 1rem;
+				font-size: 1rem;
+				border: 2px solid #e0e0e0;
+				border-radius: 6px;
+				font-family: inherit;
+				resize: vertical;
+				transition: border-color 0.3s;
+			}
+			.form-textarea:focus {
+				outline: none;
+				border-color: #3498db;
+			}
+			.tags-container {
+				position: relative;
+			}
+			.tags-display {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+				margin-bottom: 0.5rem;
+				min-height: 32px;
+			}
+			.tag-item {
+				display: inline-flex;
+				align-items: center;
+				gap: 0.5rem;
+				background: #3498db;
+				color: white;
+				padding: 0.25rem 0.75rem;
+				border-radius: 16px;
+				font-size: 0.9rem;
+			}
+			.tag-remove {
+				cursor: pointer;
+				font-weight: bold;
+				background: none;
+				border: none;
+				color: white;
+				font-size: 1.2rem;
+				padding: 0;
+				line-height: 1;
+			}
+			.tag-remove:hover {
+				color: #e74c3c;
+			}
+			.form-hint {
+				display: block;
+				color: #7f8c8d;
+				font-size: 0.875rem;
+				margin-top: 0.25rem;
+			}
+			.form-actions {
+				display: flex;
+				gap: 1rem;
+				margin-top: 2rem;
+			}
+			.btn-primary, .btn-secondary {
+				padding: 0.75rem 1.5rem;
+				font-size: 1rem;
+				font-weight: 600;
+				border: none;
+				border-radius: 6px;
+				cursor: pointer;
+				transition: all 0.3s;
+				text-decoration: none;
+				display: inline-block;
+			}
+			.btn-primary {
+				background: #3498db;
+				color: white;
+			}
+			.btn-primary:hover {
+				background: #2980b9;
+			}
+			.btn-secondary {
+				background: #ecf0f1;
+				color: #2c3e50;
+			}
+			.btn-secondary:hover {
+				background: #bdc3c7;
+			}
+		</style>
+		<script>
+			// Tag management
+			let tags = [];
+
+			function updateTagsDisplay() {
+				const display = document.getElementById('tags-display');
+				const hiddenInput = document.getElementById('tags');
+
+				display.innerHTML = tags.map((tag, index) => `
+					<span class="tag-item">
+						${tag}
+						<button type="button" class="tag-remove" onclick="removeTag(${index})">×</button>
+					</span>
+				`).join('');
+
+				hiddenInput.value = tags.join(',');
+			}
+
+			function addTag(tag) {
+				tag = tag.trim();
+				if (tag && !tags.includes(tag)) {
+					tags.push(tag);
+					updateTagsDisplay();
+				}
+			}
+
+			function removeTag(index) {
+				tags.splice(index, 1);
+				updateTagsDisplay();
+			}
+
+			function clearTags() {
+				tags = [];
+				updateTagsDisplay();
+			}
+
+			// Handle tag input
+			document.addEventListener('DOMContentLoaded', function() {
+				const tagInput = document.getElementById('tags-input');
+
+				tagInput.addEventListener('keydown', function(e) {
+					if (e.key === 'Enter') {
+						e.preventDefault();
+						addTag(this.value);
+						this.value = '';
+					} else if (e.key === ',') {
+						e.preventDefault();
+						addTag(this.value);
+						this.value = '';
+					}
+				});
+
+				tagInput.addEventListener('blur', function() {
+					if (this.value.trim()) {
+						addTag(this.value);
+						this.value = '';
+					}
+				});
+
+				// Handle form submission with HTMX
+				document.querySelector('.post-form').addEventListener('htmx:afterRequest', function(event) {
+					if (event.detail.successful) {
+						// Redirect to home page after successful submission
+						window.location.href = '/';
+					}
+				});
+			});
+		</script>
+	}
+}

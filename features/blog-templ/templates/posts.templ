@@ -1,0 +1,83 @@
+package templates
+
+import (
+	"github.com/homveloper/doodle/features/blog-templ/models"
+)
+
+templ PostList(posts []models.Post) {
+	if len(posts) == 0 {
+		<div class="no-results">
+			<p style="text-align: center; color: #7f8c8d; padding: 3rem;">
+				No posts found. Try a different search term.
+			</p>
+		</div>
+	} else {
+		<div class="posts">
+			for _, post := range posts {
+				@PostCard(post)
+			}
+		</div>
+	}
+}
+
+templ PostCard(post models.Post) {
+	<article class="post-card">
+		<h2 class="post-title">{ post.Title }</h2>
+		<div class="post-meta">
+			<span class="post-author">By { post.Author }</span>
+			<span class="post-date">{ post.CreatedAt.Format("Jan 2, 2006") }</span>
+		</div>
+		<p class="post-content">{ post.Content }</p>
+		<div class="post-tags">
+			for _, tag := range post.Tags {
+				<span class="tag">{ tag }</span>
+			}
+		</div>
+		<style>
+			.posts {
+				display: grid;
+				gap: 1.5rem;
+			}
+			.post-card {
+				background: white;
+				padding: 2rem;
+				border-radius: 8px;
+				box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+				transition: transform 0.2s, box-shadow 0.2s;
+			}
+			.post-card:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+			}
+			.post-title {
+				color: #2c3e50;
+				font-size: 1.5rem;
+				margin-bottom: 0.75rem;
+			}
+			.post-meta {
+				display: flex;
+				gap: 1rem;
+				color: #7f8c8d;
+				font-size: 0.9rem;
+				margin-bottom: 1rem;
+			}
+			.post-content {
+				color: #555;
+				line-height: 1.8;
+				margin-bottom: 1rem;
+			}
+			.post-tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.5rem;
+			}
+			.tag {
+				background: #ecf0f1;
+				color: #34495e;
+				padding: 0.25rem 0.75rem;
+				border-radius: 4px;
+				font-size: 0.85rem;
+			}
+		</style>
+	</article>
+}

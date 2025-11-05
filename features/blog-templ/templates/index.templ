@@ -1,0 +1,49 @@
+package templates
+
+import "github.com/homveloper/doodle/features/blog-templ/models"
+
+templ Index(posts []models.Post) {
+	@Layout("Blog Doodle - Home") {
+		<div class="top-actions">
+			<a href="/new" class="btn-write-post">✏️ Write New Post</a>
+		</div>
+		<div class="search-box">
+			<input
+				type="text"
+				class="search-input"
+				placeholder="Search posts by title, content, author, or tags..."
+				name="q"
+				hx-get="/search"
+				hx-trigger="keyup changed delay:300ms"
+				hx-target="#post-list"
+				hx-indicator="#search-indicator"
+			/>
+			<div id="search-indicator" class="search-indicator">
+				Searching...
+			</div>
+		</div>
+		<div id="post-list">
+			@PostList(posts)
+		</div>
+		<style>
+			.top-actions {
+				margin-bottom: 1.5rem;
+				display: flex;
+				justify-content: flex-end;
+			}
+			.btn-write-post {
+				display: inline-block;
+				padding: 0.75rem 1.5rem;
+				background: #3498db;
+				color: white;
+				text-decoration: none;
+				border-radius: 6px;
+				font-weight: 600;
+				transition: background 0.3s;
+			}
+			.btn-write-post:hover {
+				background: #2980b9;
+			}
+		</style>
+	}
+}

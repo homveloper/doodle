@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>무한 화이트보드</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- 캔버스 영역 -->
+        <canvas id="whiteboard"></canvas>
+
+        <!-- 좌표 표시 (디버깅용) -->
+        <div class="info">
+            <span id="coords">X: 0, Y: 0</span>
+            <span id="zoom-level">Zoom: 100%</span>
+        </div>
+
+        <!-- 하단 플로팅 패널 -->
+        <div class="floating-panel">
+            <!-- 펜 크기 선택 -->
+            <div class="tool-section">
+                <label>펜 크기</label>
+                <div class="pen-sizes">
+                    <button class="pen-size" data-size="2" title="얇게">
+                        <div class="pen-preview" style="width: 2px; height: 2px;"></div>
+                    </button>
+                    <button class="pen-size active" data-size="4" title="보통">
+                        <div class="pen-preview" style="width: 4px; height: 4px;"></div>
+                    </button>
+                    <button class="pen-size" data-size="8" title="굵게">
+                        <div class="pen-preview" style="width: 8px; height: 8px;"></div>
+                    </button>
+                    <button class="pen-size" data-size="16" title="아주 굵게">
+                        <div class="pen-preview" style="width: 16px; height: 16px;"></div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- 색상 선택 -->
+            <div class="tool-section">
+                <label>색상</label>
+                <div class="color-palette">
+                    <button class="color-btn active" data-color="#000000" style="background: #000000;" title="검정"></button>
+                    <button class="color-btn" data-color="#FF0000" style="background: #FF0000;" title="빨강"></button>
+                    <button class="color-btn" data-color="#00FF00" style="background: #00FF00;" title="초록"></button>
+                    <button class="color-btn" data-color="#0000FF" style="background: #0000FF;" title="파랑"></button>
+                    <button class="color-btn" data-color="#FFFF00" style="background: #FFFF00;" title="노랑"></button>
+                    <button class="color-btn" data-color="#FF00FF" style="background: #FF00FF;" title="자홍"></button>
+                    <button class="color-btn" data-color="#00FFFF" style="background: #00FFFF;" title="청록"></button>
+                    <button class="color-btn" data-color="#FFA500" style="background: #FFA500;" title="주황"></button>
+                    <button class="color-btn" data-color="#800080" style="background: #800080;" title="보라"></button>
+                    <button class="color-btn" data-color="#FFFFFF" style="background: #FFFFFF; border: 1px solid #ccc;" title="하양"></button>
+                </div>
+                <input type="color" id="custom-color" value="#000000" title="커스텀 색상">
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- 추가 도구 -->
+            <div class="tool-section">
+                <button id="clear-btn" class="action-btn" title="모두 지우기">
+                    🗑️ 지우기
+                </button>
+                <button id="reset-view-btn" class="action-btn" title="화면 리셋">
+                    🎯 리셋
+                </button>
+            </div>
+        </div>
+
+        <!-- 도움말 -->
+        <div class="help">
+            <p><strong>조작법:</strong></p>
+            <p>그리기: 마우스 드래그</p>
+            <p>이동: Space + 드래그 또는 우클릭 + 드래그</p>
+            <p>줌: 마우스 휠</p>
+        </div>
+    </div>
+
+    <script src="whiteboard.js"></script>
+</body>
+</html>
